@@ -16,7 +16,7 @@ QueueHandle_t esp_to_pix;
 
 
 void task1(void *arg){
-    /*Task1 is to receive the data from pixhawk using UART and then sending it to the other esp32 via espnow/wifi.*/
+    /*Task1 is to receive the data from pixhawk using UART and then send that same data to the ground esp32 using esp-now*/
     while(true){
         char send_data[] = "checking telem";
         xQueueSend(pix_to_esp, send_data, portMAX_DELAY);
@@ -26,7 +26,7 @@ void task1(void *arg){
 }
 
 void task2(void *arg){
-    /*Task2 is to receive the incoming data from the gcs to the esp32 via espnow/wifi and send it to pixhawk via uart*/
+    /*Task2 is to receive the incoming data from the ground esp32 via espnow and send it to pixhawk via uart*/
     while(true){
         char rec_data[100];
         xQueueReceive(esp_to_pix, rec_data, portMAX_DELAY);
