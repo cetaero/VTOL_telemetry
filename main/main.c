@@ -6,6 +6,8 @@ Please read them and write the code accordingly.*/
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "boot_banner.h"
+#include "packet.h"
 
 
 QueueHandle_t pix_to_esp;
@@ -18,7 +20,7 @@ QueueHandle_t esp_to_pix;
 void task1(void *arg){
     /*Task1 is to receive the data from pixhawk using UART and then send that same data to the ground esp32 using esp-now*/
     while(true){
-        char send_data[] = "checking telem";
+        char send_data[PACKET_SIZE] = "checking telem";
         xQueueSend(pix_to_esp, send_data, portMAX_DELAY);
         vTaskDelay(pdMS_TO_TICKS(100));
 
