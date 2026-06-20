@@ -7,3 +7,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "boot_banner.h"
+
+void app_main(void){
+    boot_banner();
+
+}
