@@ -37,7 +37,7 @@ static void start_esp_now(void){
     peer.channel = CONFIG_ESPNOW_CHANNEL;
     peer.ifidx = WIFI_IF_STA;
     peer.encrypt = false;
-    ESP_ERROR_CHECK(esp_now_add_peer(peer.peer_addr));
+    ESP_ERROR_CHECK(esp_now_add_peer(&peer));
 }
 
 static test1(void){
@@ -47,7 +47,7 @@ static test1(void){
 
     while(true){
         esp_err_t ret = esp_now_send(BROADCAST_MAC, (const uint8_t *)packet, length);
-        if(ret != "ESP_OK"){
+        if(ret != ESP_OK){
             ESP_LOGE(TAG, "ESP NOW FAILED!. ERROR: %s", esp_err_to_name(ret));
 
         } else {
