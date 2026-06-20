@@ -25,7 +25,7 @@ QueueHandle_t esp_to_pix;
 #define FC_UART UART_NUM_1
 
 #define FC_TX_PIN GPIO_NUM_6
-#define FC_RX_PIN GPIO_NUM_7
+#define FC_RX_PIN GPIO_NUM_7    
 
 #define ESPNOW_CHANNEL 1
 
@@ -146,7 +146,7 @@ void task2(void *arg)
             uart_write_bytes(
                 FC_UART,
                 rec_data,
-                strlen(rec_data));
+                strlen(rec_data));  
         }
     }
 }
