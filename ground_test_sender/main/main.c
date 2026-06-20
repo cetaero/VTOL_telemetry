@@ -6,10 +6,18 @@
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "nvs_flash.h"
+#include "esp_now.h"
 
 #include "boot_banner.h"
 
+#define TAG "ESP_NOW"
+
+const uint8_t BROADCAST_MAC[ESP_NOW_ETH_ALEN];
+
+
 void app_main(void){
     boot_banner();
+    ESP_ERROR_CHECK(nvs_flash_init());  
 
 }
