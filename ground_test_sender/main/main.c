@@ -33,6 +33,7 @@ static void start_esp_now(void){
 
     esp_now_peer_info_t peer = {0};
     memset(&peer, 0, sizeof(esp_now_peer_info_t));
+    memcpy(peer.peer_addr, BROADCAST_MAC, ESP_NOW_ETH_ALEN);
     peer.channel = CONFIG_ESPNOW_CHANNEL;
     peer.ifidx = WIFI_IF_STA;
     peer.encrypt = false;
@@ -42,7 +43,7 @@ static void start_esp_now(void){
 static test1(void){
     //what test1 basically does is that it sends a custom string like "hello world" to the receiver esp32
     static const char packet[] = "hello world";
-    const size_t length = strlen(packet);
+    const size_t length = strlen(packet);   
 
     while(true){
         esp_err_t ret = esp_now_send(BROADCAST_MAC, (const uint8_t *)packet, length);
@@ -63,8 +64,7 @@ void app_main(void){
     boot_banner();
     ESP_ERROR_CHECK(nvs_flash_init());  
     start_esp_now();
-    test1();
-    xTaskCreate(test1, "test1", 4096, NULL, 5, NULL);
+    xTaskCreate(test1, "test1", 4096, NULL, 5, NULL); //removed test1() as it creates an infinite loop before task create
 
 
 }
