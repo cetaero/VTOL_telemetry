@@ -43,3 +43,4 @@ void boot_banner(void){
     } else {
         ESP_LOGI(TAG, "MAC ADDRESS RETRIEVAL UNSUCCESSFUL");
     }
+}
