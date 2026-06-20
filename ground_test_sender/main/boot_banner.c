@@ -13,7 +13,7 @@
 
 static const char *TAG = "ESP_NOW";
 
-void boot_banner(uint8_t *mac_addr){
+void boot_banner(void){
 
     
     printf("======================\n");
@@ -40,16 +40,6 @@ void boot_banner(uint8_t *mac_addr){
         ESP_LOGI(TAG, "%02X : %02X : %02X : %02X : %02X : %02X" , mac_buffer[0], mac_buffer[1], mac_buffer[2], mac_buffer[3], mac_buffer[4],mac_buffer[5]);
         ESP_LOGI(TAG, "SYSTEM READY!!!");
     
-
-    if(mac_addr != NULL){
-        memcpy(mac_addr, mac_buffer, 6);
+    } else {
+        ESP_LOGI(TAG, "MAC ADDRESS RETRIEVAL UNSUCCESSFUL");
     }
- } else {
-        ESP_LOGE(TAG, "FAILED TO READ MAC ADDRESS!");
-        if(mac_addr != NULL){
-            memset(mac_addr, 0, 6);
-
-        }
-    }
-
-}
