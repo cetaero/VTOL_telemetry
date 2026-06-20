@@ -16,6 +16,8 @@ Please read them and write the code accordingly.*/
 #include "driver/uart.h"
 #include "driver/gpio.h"
 
+#include "boot_banner.h"    
+
 
 QueueHandle_t pix_to_esp;
 QueueHandle_t esp_to_pix;
@@ -155,8 +157,10 @@ void task2(void *arg)
 
 void app_main(void)
 {
+    boot_banner();
+    
     ESP_ERROR_CHECK(nvs_flash_init());
-
+    
     uart_init_fc();
     
 
