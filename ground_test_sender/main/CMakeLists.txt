@@ -9,5 +9,9 @@ idf_component_register(
         esp_netif
         esp_driver_uart
         esp_driver_gpio
-    INCLUDE_DIRS ""
+    INCLUDE_DIRS "."
+    "mavlink"
+    "mavlink/common"
 )
+
+target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-address-of-packed-member)
