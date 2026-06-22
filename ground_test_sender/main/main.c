@@ -21,7 +21,7 @@
 #define ESPNOW_WIFI_MODE WIFI_MODE_STA
 #define CONFIG_ESPNOW_CHANNEL 1
 
-#define START_TEST 1
+#define START_TEST 2
 
 static uint8_t RECEIVER_MAC[ESP_NOW_ETH_ALEN] = {0xA0, 0x85, 0xE3, 0x0D, 0x84, 0x10}; //copied the MAC address from receiver side
 
