@@ -21,6 +21,7 @@
 #define ESPNOW_WIFI_MODE WIFI_MODE_STA
 #define CONFIG_ESPNOW_CHANNEL 1
 
+#define START_TEST 1
 
 static uint8_t RECEIVER_MAC[ESP_NOW_ETH_ALEN] = {0xA0, 0x85, 0xE3, 0x0D, 0x84, 0x10}; //copied the MAC address from receiver side
 
@@ -127,11 +128,11 @@ void app_main(void){
     ESP_ERROR_CHECK(nvs_flash_init());  
     start_esp_now();
 
-   
+    #if START_TEST == 1
         xTaskCreate(test1, "test1", 4096, NULL, 5, NULL); //removed test1() as it creates an infinite loop before task create
-   
+    #else
         xTaskCreate(test2, "test2", 4096, NULL, 5, NULL);
-   
+    #endif
 
 
 
