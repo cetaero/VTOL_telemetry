@@ -1,0 +1,27 @@
+{
+  "C_Cpp.intelliSenseEngine": "tag-parser",
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+  "C_Cpp.default.intelliSenseMode": "gcc-xtensa",
+  "C_Cpp.default.cStandard": "c11",
+  "idf.extensionActivationMode": "always",
+  "idf.openOcdConfigs": [
+    "board/esp32-wrover-kit-3.3v.cfg"
+  ],
+  "idf.currentSetup": "C:\\ESPIDF\\v6.0.1\\esp-idf",
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32"
+  },
+  "clangd.path": "C:\\Espressif\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\bin\\clangd.exe",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=**",
+    "--compile-commands-dir=c:\\Users\\MELVIN SOJI\\FC-ESP-GRND\\build"
+  ],
+  "files.exclude": {
+    "build": false
+  },
+  "search.exclude": {
+    "build": false
+  },
+  "idf.flashType": "UART"
+}
