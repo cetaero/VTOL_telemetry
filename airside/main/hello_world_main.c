@@ -33,6 +33,14 @@ QueueHandle_t esp_to_pix;
 
 static const char *TAG = "AIRSIDE";
 
+//creating a structue for receving mavlink packet
+typedef struct {
+    uint8_t msg[PACKET_SIZE];
+    size_t len;
+} packet;
+
+
+
 static void uart_init_fc(void)
 {
     uart_config_t uart_config = {
@@ -69,20 +77,25 @@ static void espnow_recv_cb(
     const uint8_t *data,
     int len)
 {
-    char msg[PACKET_SIZE];
+   // char msg[PACKET_SIZE]; commented out string
+
+    packet pack;
+
+
+
 
     if(len >= PACKET_SIZE)
     {
         len = PACKET_SIZE - 1;
     }
 
-    memcpy(msg, data, len);
-
-    msg[len] = '\0';
+    memcpy(pack.msg, data, len); //edited msg with pack.msg
+    pack.len = len;
+    //msg[len] = '\0';
 
     xQueueSend(
         esp_to_pix,
-        msg,
+        &pack, //edited msg with &pack
         0);
 }
 
@@ -133,22 +146,23 @@ void task2(void *arg)
 {
     while(true)
     {
-        char rec_data[PACKET_SIZE];
+        //char rec_data[PACKET_SIZE];
+        packet pack; 
 
         if(xQueueReceive(
                 esp_to_pix,
-                rec_data,
+                &pack,
                 portMAX_DELAY))
         {
             ESP_LOGI(
                 TAG,
                 "Sending to Pixhawk: %s",
-                rec_data);
+                pack.msg);
 
             uart_write_bytes(
                 FC_UART,
-                rec_data,
-                strlen(rec_data));  
+                pack.msg, //edited rec_data with pack.msg
+                pack.len);      //edited strlen function with pack.len
         }
     }
 }
@@ -165,7 +179,7 @@ void app_main(void)
     
 
     pix_to_esp = xQueueCreate(QUEUE_SLOTS, PACKET_SIZE);
-    esp_to_pix = xQueueCreate(QUEUE_SLOTS, PACKET_SIZE);
+    esp_to_pix = xQueueCreate(QUEUE_SLOTS, sizeof(packet));
 
     espnow_init();
 
