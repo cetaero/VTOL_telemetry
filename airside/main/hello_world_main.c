@@ -35,7 +35,7 @@
 
     //creating a structue for receving mavlink packet
     typedef struct {
-        uint8_t msg[PACKET_SIZE - 3]; //bcos apparently len is 3 bytes. 
+        uint8_t msg[PACKET_SIZE]; 
         size_t len;
     } packet;
 
@@ -178,8 +178,8 @@
         uart_init_fc();
         
 
-        pix_to_esp = xQueueCreate(QUEUE_SLOTS, PACKET_SIZE);
-        esp_to_pix = xQueueCreate(QUEUE_SLOTS, PACKET_SIZE);//
+        pix_to_esp = xQueueCreate(QUEUE_SLOTS, sizeof(packet)); //PACKET_SIZE -> sizeof(packet)
+        esp_to_pix = xQueueCreate(QUEUE_SLOTS, sizeof(packet));//
 
         espnow_init();
 
