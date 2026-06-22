@@ -156,8 +156,8 @@
             {
                 ESP_LOGI(
                     TAG,
-                    "Sending to Pixhawk: %s",
-                    pack.msg);
+                    "Sending to Pixhawk: %d bytes sent", //%s doesnt work.
+                    pack.len);
 
                 uart_write_bytes(
                     FC_UART,
