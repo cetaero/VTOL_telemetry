@@ -15,7 +15,7 @@ Please read them and write the code accordingly.*/
 #include "nvs_flash.h"
 #include "driver/uart.h"
 #include "driver/gpio.h"
-
+#include "boot_banner.h" //added boot banner
 
 QueueHandle_t esp_to_laptop;
 
