@@ -18,6 +18,7 @@ Please read them and write the code accordingly.*/
 #include "boot_banner.h" //added boot banner
 
 QueueHandle_t esp_to_laptop;
+QueueHandle_t uart_queue;
 
 #define PACKET_SIZE 250
 #define QUEUE_SLOTS 10
@@ -65,12 +66,13 @@ static void uart_init_laptop(void)
         .source_clk = UART_SCLK_DEFAULT,
     };
 
+
     uart_driver_install(
         LAPTOP_UART,
         256,
         256,
-        0,
-        NULL,
+        sizeof(espnow_pkt_t),   //modified it based on the size of uart queue
+        uart_queue,
         0);
 
     uart_param_config(
@@ -190,6 +192,7 @@ void task2(void *arg)
 {
     /*Not used yet — placeholder for symmetry. Could later report stats
       (dropped_packets, link health) back up to the laptop or air unit.*/
+      //This task will be to receive bytes from UART and trasmit it to the 
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -212,6 +215,8 @@ ESP_ERROR_CHECK(ret);
 
     uart_init_laptop();
 
+    uart_queue = xQueueCreate(QUEUE_SLOTS, sizeof(espnow_pkt_t)); //writing a queue for uart because we reading 
+    //and writing data from it at same time
     esp_to_laptop = xQueueCreate(QUEUE_SLOTS, sizeof(espnow_pkt_t));
 
     espnow_init();
