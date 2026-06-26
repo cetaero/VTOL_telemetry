@@ -186,16 +186,28 @@ void task1(void *arg)
             uart_write_bytes(LAPTOP_UART, (const char *)pkt.data, pkt.len);
         }
     }
+
 }
 
 void task2(void *arg)
 {
     /*Not used yet — placeholder for symmetry. Could later report stats
       (dropped_packets, link health) back up to the laptop or air unit.*/
-      //This task will be to receive bytes from UART and trasmit it to the 
-    while (true) {
-        vTaskDelay(pdMS_TO_TICKS(1000));
+      //This task will be to receive the packet from GCS and then transmit it to the Esp-now channel
+
+    espnow_pkt_t pkt1; //
+
+    while(true){
+        if(xQueueReceive(
+            uart_queue,
+            &pkt1,
+            portMAX_DELAY)){
+                ESP_LOGI(TAG, "Received %d bytes", pkt1.len);
+            }
+            uart_read_bytes(LAPTOP_UART, (const char *)pkt1.data, pkt1.len);
     }
+
+        
 }
 
 
