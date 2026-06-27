@@ -211,11 +211,11 @@ void task2(void *arg)
     uint8_t buff[PACKET_SIZE]; //buffer to hold the received data
    
     while(true){
-        int n = uart_read_bytes(LAPTOP_UART, buff, PACKET_SIZE, portMAX_DELAY);
+        int n = uart_read_bytes(LAPTOP_UART, buff, PACKET_SIZE, pdMS_TO_TICKS(20)); //20ms waittimee till it moves on
         if(n<0){
             ESP_LOGI(TAG, "UART reading error!!");
             //n = -1 means there has been an error. if n> 0, it is the numbe of bytes read. 
-            return;
+            continue;
         } 
         esp_err_t rets = esp_now_send(AIRSIDE_MAC, buff, n);
         if(rets == ESP_OK){
