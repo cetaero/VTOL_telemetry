@@ -16,6 +16,9 @@ Please read them and write the code accordingly.*/
 #include "driver/uart.h"
 #include "driver/gpio.h"
 #include "boot_banner.h" //added boot banner
+#include "mavlink/common/mavlink.h" //added Mavlink C library 
+
+
 
 QueueHandle_t esp_to_laptop;
 QueueHandle_t uart_queue;
@@ -33,9 +36,10 @@ QueueHandle_t uart_queue;
 // MAC address of the airside ESP32. Replace with the real address —
 // read it off the airside unit at boot (esp_wifi_get_mac) and hardcode
 // it here. Packets from any other sender are ignored.
-static const uint8_t AIRSIDE_MAC[6] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
+static const uint8_t AIRSIDE_MAC[6] = {0xA0, 0x85, 0xE3, 0x0D, 0x84, 0x10}; //updated based on the receiver
 
 static const char *TAG = "GROUND_RX";
+
 
 // Holds packets handed from the ESP-NOW recv callback to the forwarding
 // task. Fixed size so no heap allocation happens inside the callback.
@@ -71,8 +75,8 @@ static void uart_init_laptop(void)
         LAPTOP_UART,
         256,
         256,
-        sizeof(espnow_pkt_t),   //modified it based on the size of uart queue
-        uart_queue,
+        0,   //modified it based on the size of uart queue
+        NULL,
         0);
 
     uart_param_config(
@@ -119,6 +123,16 @@ static void espnow_recv_cb(
     }
 }
 
+
+
+
+
+
+
+
+
+
+
 static void espnow_init(void)
 {
     ESP_ERROR_CHECK(esp_netif_init());
@@ -164,6 +178,13 @@ if (!esp_now_is_peer_exist(AIRSIDE_MAC))
 }
 }
 
+static void espnow_send_cb(void){
+    mavlink_message_t pkt0;
+    uint16_t buff[MAVLINK_MAX_PACKET_LEN];  //declared a buffer with max size of each packet assumed to be 16 bits long
+    esp_err_t = esp_now_send(AIRSIDE_MAC, &pkt0, pkt0->len);
+
+}
+
 
 void task1(void *arg)
 {
@@ -191,24 +212,24 @@ void task1(void *arg)
 
 void task2(void *arg)
 {
-    /*Not used yet — placeholder for symmetry. Could later report stats
-      (dropped_packets, link health) back up to the laptop or air unit.*/
-      //This task will be to receive the packet from GCS and then transmit it to the Esp-now channel
+    //task2 is to recieve bytes from GCS via UART and send them to the esp-now channel
+    uint16_t buff[PACKET_SIZE]; //buffer to hold the received data
+    
+    int n = uart_read_bytes(LAPTOP_UART, buff, PACKET_SIZE, portMAX_DELAY);
+    if(n<0){
+        ESP_LOGI(TAG, "UART reading error!!");
+        //n = -1 means there has been an error. if n> 0, it is the numbe of bytes read. 
+    } 
+    esp_err_t rets = esp_now_send(AIRSIDE_MAC, buff, n);
+    if(rets == ESP_OK){
+        ESP_LOGI(TAG, "%d bytes send successfully!", n);
+    } else {
+        ESP_LOGE(TAG, "ESP-NOW connection was unsuccessful!");
 
-    espnow_pkt_t pkt1; //
-
-    while(true){
-        if(xQueueReceive(
-            uart_queue,
-            &pkt1,
-            portMAX_DELAY)){
-                ESP_LOGI(TAG, "Received %d bytes", pkt1.len);
-            }
-            uart_read_bytes(LAPTOP_UART, (const char *)pkt1.data, pkt1.len);
     }
 
-        
 }
+
 
 
 
@@ -226,9 +247,6 @@ if (ret == ESP_ERR_NVS_NO_FREE_PAGES ||
 ESP_ERROR_CHECK(ret);
 
     uart_init_laptop();
-
-    uart_queue = xQueueCreate(QUEUE_SLOTS, sizeof(espnow_pkt_t)); //writing a queue for uart because we reading 
-    //and writing data from it at same time
     esp_to_laptop = xQueueCreate(QUEUE_SLOTS, sizeof(espnow_pkt_t));
 
     espnow_init();
