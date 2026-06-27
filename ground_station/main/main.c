@@ -178,12 +178,6 @@ if (!esp_now_is_peer_exist(AIRSIDE_MAC))
 }
 }
 
-static void espnow_send_cb(void){
-    mavlink_message_t pkt0;
-    uint16_t buff[MAVLINK_MAX_PACKET_LEN];  //declared a buffer with max size of each packet assumed to be 16 bits long
-    esp_err_t = esp_now_send(AIRSIDE_MAC, &pkt0, pkt0->len);
-
-}
 
 
 void task1(void *arg)
@@ -213,21 +207,25 @@ void task1(void *arg)
 void task2(void *arg)
 {
     //task2 is to recieve bytes from GCS via UART and send them to the esp-now channel
-    uint16_t buff[PACKET_SIZE]; //buffer to hold the received data
-    
-    int n = uart_read_bytes(LAPTOP_UART, buff, PACKET_SIZE, portMAX_DELAY);
-    if(n<0){
-        ESP_LOGI(TAG, "UART reading error!!");
-        //n = -1 means there has been an error. if n> 0, it is the numbe of bytes read. 
-    } 
-    esp_err_t rets = esp_now_send(AIRSIDE_MAC, buff, n);
-    if(rets == ESP_OK){
-        ESP_LOGI(TAG, "%d bytes send successfully!", n);
-    } else {
-        ESP_LOGE(TAG, "ESP-NOW connection was unsuccessful!");
+
+    uint8_t buff[PACKET_SIZE]; //buffer to hold the received data
+   
+    while(true){
+        int n = uart_read_bytes(LAPTOP_UART, buff, PACKET_SIZE, portMAX_DELAY);
+        if(n<0){
+            ESP_LOGI(TAG, "UART reading error!!");
+            //n = -1 means there has been an error. if n> 0, it is the numbe of bytes read. 
+            return;
+        } 
+        esp_err_t rets = esp_now_send(AIRSIDE_MAC, buff, n);
+        if(rets == ESP_OK){
+            ESP_LOGI(TAG, "%d bytes send successfully!", n);
+        } else {
+            ESP_LOGE(TAG, "ESP-NOW connection was unsuccessful!");
+
+        }
 
     }
-
 }
 
 
