@@ -33,6 +33,8 @@
 
     static const char *TAG = "AIRSIDE";
 
+    static const uint8_t GROUNDSIDE_MAC[ESP_NOW_ETH_ALEN] = {0xA0, 0x85, 0xE3, 0x0D, 0x84, 0x10}; //NEEDS TO BE EDITED TO GROUND SIDE MAC
+
     //creating a structue for receving mavlink packet
     typedef struct {
         uint8_t msg[PACKET_SIZE]; 
@@ -129,16 +131,38 @@
 
         esp_now_register_recv_cb(
             espnow_recv_cb);
+        
+        esp_now_peer_info_t peer = {0}; //adding peer
+        memcpy(peer.peer_addr, GROUNDSIDE_MAC, ESP_NOW_ETH_ALEN);
+        peer.channel = ESPNOW_CHANNEL;
+        peer.ifidx =  WIFI_IF_STA;
+        peer.encrypt = false;
+        ESP_ERROR_CHECK(esp_now_add_peer(&peer));
+
+
     }
 
 
     void task1(void *arg){
         /*Task1 is to receive the data from pixhawk using UART and then send that same data to the ground esp32 using esp-now*/
         while(true){
-            int n = uart_read_bytes(FC_UART, )
-            char send_data[] = "checking telem";
-            xQueueSend(pix_to_esp, send_data, portMAX_DELAY);
-            vTaskDelay(pdMS_TO_TICKS(100));
+            uint8_t buff[PACKET_SIZE];  //buffer to store the received data
+
+            int n = uart_read_bytes(FC_UART, buff, PACKET_SIZE, pdMS_TO_TICKS(10));
+            if(n < 0){
+                ESP_LOGE(TAG, "Error while reading from UART");
+                continue;
+            }
+            xQueueSend(pix_to_esp,buff, portMAX_DELAY);
+            esp_err_t rets = esp_now_send(GROUNDSIDE_MAC, buff, n);
+            if(rets == ESP_OK){
+                ESP_LOGI(TAG, "ESP-NOW sending successfull");
+
+            }else{
+                continue;
+            }
+            
+           
 
         }
     }
