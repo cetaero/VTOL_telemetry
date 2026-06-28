@@ -101,6 +101,14 @@
             0);
     }
 
+
+
+    static void esp_now_send_cb(const esp_now_send_info_t *tx_info, esp_now_send_status_t status){
+        if(status != ESP_NOW_SEND_SUCCESS){
+            ESP_LOGI(TAG, "ESP_NOW WAS FAILED!");
+        }
+    }
+
     static void espnow_init(void)
     {
         ESP_ERROR_CHECK(esp_netif_init());
@@ -132,6 +140,10 @@
         esp_now_register_recv_cb(
             espnow_recv_cb);
         
+        esp_now_register_send_cb(
+            esp_now_send_cb
+        );
+        
         esp_now_peer_info_t peer = {0}; //adding peer
         memcpy(peer.peer_addr, GROUNDSIDE_MAC, ESP_NOW_ETH_ALEN);
         peer.channel = ESPNOW_CHANNEL;
@@ -143,6 +155,7 @@
     }
 
 
+
     void task1(void *arg){
         /*Task1 is to receive the data from pixhawk using UART and then send that same data to the ground esp32 using esp-now*/
         while(true){
@@ -150,22 +163,19 @@
 
             int n = uart_read_bytes(FC_UART, buff, PACKET_SIZE, pdMS_TO_TICKS(10));
             if(n <= 0){
-                ESP_LOGE(TAG, "Error while reading from UART");
-                continue;
+                if(n <0){
+                    ESP_LOGE(TAG, "Error while reading from UART");
+                    continue;
+                }
             }
             
             esp_err_t rets = esp_now_send(GROUNDSIDE_MAC, buff, n);
-            if(rets == ESP_OK){
-                ESP_LOGI(TAG, "ESP-NOW sending successfull");
-
-            }else{
+            if(rets != ESP_OK){
                 continue;
-            }
-            
-           
 
         }
     }
+}
 
     void task2(void *arg)
     {
