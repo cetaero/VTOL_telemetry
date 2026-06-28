@@ -149,11 +149,11 @@
             uint8_t buff[PACKET_SIZE];  //buffer to store the received data
 
             int n = uart_read_bytes(FC_UART, buff, PACKET_SIZE, pdMS_TO_TICKS(10));
-            if(n < 0){
+            if(n <= 0){
                 ESP_LOGE(TAG, "Error while reading from UART");
                 continue;
             }
-            xQueueSend(pix_to_esp,buff, portMAX_DELAY);
+            
             esp_err_t rets = esp_now_send(GROUNDSIDE_MAC, buff, n);
             if(rets == ESP_OK){
                 ESP_LOGI(TAG, "ESP-NOW sending successfull");
@@ -169,6 +169,7 @@
 
     void task2(void *arg)
     {
+        //task2 is to receive data from esp-now and write it to uart
         while(true)
         {
             //char rec_data[PACKET_SIZE];
@@ -203,7 +204,7 @@
         uart_init_fc();
         
 
-        pix_to_esp = xQueueCreate(QUEUE_SLOTS, sizeof(packet)); //PACKET_SIZE -> sizeof(packet)
+      
         esp_to_pix = xQueueCreate(QUEUE_SLOTS, sizeof(packet));//
 
         espnow_init();
