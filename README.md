@@ -22,8 +22,6 @@ VTOL Telemetry allows establishing the link between the VTOL aircraft and the Gr
 - ESP32
 - LoRa
 - MAVLink
-- UART
-- SPI
 
 ## Future Work
 - Full testing and validation of the telemetry system.
